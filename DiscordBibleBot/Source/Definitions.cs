@@ -1,12 +1,11 @@
 ﻿using System.IO;
 using System.Reflection;
 
-namespace DiscordBibleBot
+namespace DiscordBibleBot.Source;
+
+public static class Definitions
 {
-    public static class Definitions
-    {
-        public static readonly string ResourceDir = Path.Join(
-            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), 
-            @"resources");
-    }
+    public static readonly string ResourceDir = Path.Join(
+        Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), 
+        @"Resources");
 }

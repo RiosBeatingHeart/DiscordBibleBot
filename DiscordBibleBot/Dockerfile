@@ -1,18 +1,17 @@
-﻿FROM mcr.microsoft.com/dotnet/runtime:6.0 AS base
-WORKDIR /app
+# https://hub.docker.com/_/microsoft-dotnet
+FROM mcr.microsoft.com/dotnet/sdk:7.0-jammy AS build
+WORKDIR /source
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
-WORKDIR /src
-COPY ["DiscordBibleBot/DiscordBibleBot.csproj", "DiscordBibleBot/"]
-RUN dotnet restore "DiscordBibleBot/DiscordBibleBot.csproj"
+# copy csproj and restore as distinct layers
+COPY *.csproj .
+RUN dotnet restore -r linux-arm64
+
+# copy and publish app and libraries
 COPY . .
-WORKDIR "/src/DiscordBibleBot"
-RUN dotnet build "DiscordBibleBot.csproj" -c Release -o /app/build
+RUN dotnet publish -c Release -o /app -r linux-arm64 --self-contained true --no-restore
 
-FROM build AS publish
-RUN dotnet publish "DiscordBibleBot.csproj" -c Release -o /app/publish
-
-FROM base AS final
+# final stage/image
+FROM mcr.microsoft.com/dotnet/runtime:6.0-jammy-arm64v8
 WORKDIR /app
-COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "DiscordBibleBot.dll"]
+COPY --from=build /app .
+ENTRYPOINT ["./DiscordBibleBot"]
