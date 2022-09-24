@@ -1,11 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using DSharpPlus;
-using DSharpPlus.CommandsNext;
 using OpenAI_API;
-using DiscordBibleBot.Source.Database;
+using DSharpPlus.SlashCommands;
 
 namespace DiscordBibleBot.Source;
 
@@ -20,48 +20,40 @@ public class Bot
         get => _instance ??= new Bot();
         private set => _instance = value;
     }
-
-    private DiscordClient? _client;
-    public DiscordClient Client
+    
+    public HashSet<string> BibleWords { get; private set; }
+    
+    private DiscordClient? _discordClient;
+    public DiscordClient DiscordClient
     {
-        get => _client ?? throw new Exception("Discord client not set!");
+        get => _discordClient ?? throw new NullReferenceException("Discord client not set!");
         set
         {
-            _client = value;
-            Commands = Client.UseCommandsNext(new CommandsNextConfiguration
-            {
-                StringPrefixes = new[] {Icon}
-            });
+            _discordClient = value;
+            SlashCommands = DiscordClient.UseSlashCommands();
         }
     }
+    
+    private SlashCommandsExtension? _slashCommands;
 
-    private IDatabase? _database;
-    public IDatabase Database
+    public SlashCommandsExtension SlashCommands
     {
-        get => _database ?? throw new Exception("Database not set!");
-        set => _database = value;
-    }
-
-    private CommandsNextExtension? _commands;
-    public CommandsNextExtension Commands
-    {
-        get => _commands ?? throw new Exception("Commands (CommandsNextExtension) not set!");
-        private set => _commands = value;
+        get => _slashCommands ?? throw new NullReferenceException("Commands (CommandsNextExtension) not set!");
+        private set => _slashCommands = value;
     }
 
     private string? _biblePath;
     public string BiblePath 
     { 
-        get => _biblePath ?? throw new Exception("BiblePath not set!");
+        get => _biblePath ?? throw new NullReferenceException("BiblePath not set!");
         set => _biblePath = value;
     }
 
     private OpenAIAPI? _openAiApi;
     public OpenAIAPI OpenAiApi {
-        get => _openAiApi ?? throw new Exception("OpenAI API not set!");
+        get => _openAiApi ?? throw new NullReferenceException("OpenAI API not set!");
         set => _openAiApi = value;
     }
-
 
     private int _minLetterLimit = 4;
     public int MinLetterLimit
@@ -70,18 +62,17 @@ public class Bot
         set => _minLetterLimit = value >= 0 ? value : 0;
     }
 
-    public const string Icon = "🙏";
-    
-    private Bot() { }
+    private Bot()
+    {
+        BibleWords = new HashSet<string>();
+    }
 
     /// <summary>
     /// Runs the Bot.
     /// </summary>
     public void Run()
     {
-        Database.Connect();
-        if (Database.Words.Count < 10000)
-            LoadBible();
+        LoadBible();
         RunAsync().GetAwaiter().GetResult();
     }
 
@@ -91,7 +82,7 @@ public class Bot
     private async Task RunAsync()
     {
         await Console.Out.WriteLineAsync("Starting Bot!");
-        await Client.ConnectAsync();
+        await DiscordClient.ConnectAsync();
         await Task.Delay(-1);
     }
 
@@ -101,7 +92,8 @@ public class Bot
     /// <returns>The singleton Bot instance.</returns>
     public Bot LoadBible()
     {
-        Console.Out.WriteLine("Loading words! This might take a little.");
+        Console.Out.WriteLine("Loading words from bible! This might take a little.");
+        Console.Out.WriteLine($"Bible URL: {BiblePath}.");
 
         using (var stream = new HttpClient().GetStreamAsync(BiblePath).GetAwaiter().GetResult())
         {
@@ -118,12 +110,12 @@ public class Bot
                 if (start > 0)
                     line = line.Substring(start);
 
-                Database?.Words.Add(Utils.GetWordsInString(line));
+                BibleWords.UnionWith(Utils.GetWordsInString(line));
                 line = reader.ReadLine();
             }
         }
 
-        Console.Out.WriteLine($"Successfully loaded {Database?.Words.Count} words!");
+        Console.Out.WriteLine($"Successfully loaded {BibleWords.Count} words!");
         return this;
     }
 
@@ -134,7 +126,7 @@ public class Bot
     /// <returns>The singleton Bot instance.</returns>
     public Bot SetClient(DiscordClient client)
     {
-        Client = client;
+        DiscordClient = client;
         return this;
     }
 
@@ -145,18 +137,7 @@ public class Bot
     /// <returns>The singleton Bot instance.</returns>
     public Bot SetClient(DiscordConfiguration? config)
     {
-        Client = new DiscordClient(config);
-        return this;
-    }
-
-    /// <summary>
-    /// Sets the database instance the bot will use.
-    /// </summary>
-    /// <param name="database"></param>
-    /// <returns>The singleton Bot instance.</returns>
-    public Bot SetDatabase(IDatabase database)
-    {
-        Database = database;
+        DiscordClient = new DiscordClient(config);
         return this;
     }
 

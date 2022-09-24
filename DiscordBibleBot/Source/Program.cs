@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.IO;
-using DiscordBibleBot.Source.Database;
+using DiscordBibleBot.Source.Commands;
 using DSharpPlus;
 using OpenAI_API;
 
@@ -10,13 +10,12 @@ internal static class Program
 {
     private static void Main(string[] args)
     {
-        string databasePath = ConfigurationManager.AppSettings["DatabasePath"] ?? throw new NullReferenceException();
         string oauth2Token = ConfigurationManager.AppSettings["BotToken"] ?? throw new NullReferenceException();
         string biblePath = ConfigurationManager.AppSettings["BiblePath"] ?? throw new NullReferenceException();
         string openAiKey = ConfigurationManager.AppSettings["OpenAiApiKey"] ?? throw new NullReferenceException();
-        
-        
-        
+
+
+
         Bot bibleBot = Bot.Instance
             .SetBiblePath(biblePath)
             .SetClient(new DiscordConfiguration
@@ -25,7 +24,6 @@ internal static class Program
                 TokenType = TokenType.Bot,
                 Intents = DiscordIntents.AllUnprivileged
             })
-            .SetDatabase(new MemoryDatabase())
             .SetOpenAiApi(new OpenAIAPI(new APIAuthentication(openAiKey), Engine.Davinci));
         // .SetDatabase(new SqLiteDatabase().SetPath(Path.Join(Definitions.ResourceDir, databasePath)))
             
@@ -33,11 +31,14 @@ internal static class Program
             bibleBot.SetMinLetterLimit(int.Parse(ConfigurationManager.AppSettings["MinLetterLimit"]!));
 
         // register event handlers
-        bibleBot.Client.MessageCreated += EventHandlers.HandleMessageCreated;
-        bibleBot.Client.MessageReactionAdded += EventHandlers.HandleReactionAdded;
+        bibleBot.DiscordClient.MessageCreated += EventHandlers.MessageAddedReplyBot;
+        bibleBot.DiscordClient.MessageCreated += EventHandlers.MessageAddedCheckable;
+        bibleBot.DiscordClient.MessageCreated += EventHandlers.MessageAddedVotableContent;
+        bibleBot.DiscordClient.MessageCreated += EventHandlers.MessageAddedMentionBot;
+        bibleBot.DiscordClient.MessageReactionAdded += EventHandlers.ReactionAdded;
 
         // register commands
-        bibleBot.Commands.RegisterCommands<Commands>();
+        bibleBot.SlashCommands.RegisterCommands<SlashCommands>(959603483072405574);
 
         bibleBot.Run();
     }
