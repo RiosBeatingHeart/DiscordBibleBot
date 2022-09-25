@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Reflection;
 
-namespace DiscordBibleBot.Source;
+namespace DiscordDemonBot.Source;
 
 public static class Definitions
 {

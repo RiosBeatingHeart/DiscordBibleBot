@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
-using static DiscordBibleBot.Source.Utils;
+using static DiscordDemonBot.Source.Utils;
 
 #pragma warning disable CS4014 // call async without await
 
-namespace DiscordBibleBot.Source;
+namespace DiscordDemonBot.Source;
 public static class EventHandlers
 {
     /// <summary>
@@ -20,15 +20,35 @@ public static class EventHandlers
     /// <param name="e">The message event.</param>
     public static async Task MessageAddedVotableContent(DiscordClient client, MessageCreateEventArgs e)
     {
-        // add reactions to images, videos and curseforge links in a specific channel
-        if (e.Channel.Id == 963739089549533245 && 
-            e.Message.Content.Contains("https://www.curseforge.com/minecraft/") ||
-            e.Message.Content.Contains("https://open.spotify.com/") ||
-            e.Message.Attachments.Count > 0)
+        Task.Run(async () =>
         {
-            await e.Message.CreateReactionAsync(DiscordEmoji.FromGuildEmote(client,964881658182529064)); // cross_up
-            await e.Message.CreateReactionAsync(DiscordEmoji.FromGuildEmote(client,964881919126945853)); // cross_down
-        }
+            string[] textContent = new[]
+            {
+                "https://www.curseforge.com/minecraft/",
+                "https://open.spotify.com/",
+                "https://www.youtube.com/",
+                "https://www.youtu.be/",
+                "https://www.youtu.be/",
+            };
+
+            bool hasContent = e.Message.Attachments.Count > 0;
+            if(!hasContent)
+            {
+                // add reactions to images, videos and curseforge links in a specific channel
+                foreach (var text in textContent)
+                {
+                    if (!e.Message.Content.Contains(text)) continue;
+                    hasContent = true;
+                    break;
+                }
+            }
+            if (!hasContent) return;
+            
+            await Console.Out.WriteLineAsync("Adding vote emojis to message!");
+            await e.Message.CreateReactionAsync(DiscordEmoji.FromGuildEmote(client, 1023358264617992212)); // up_penty
+            await e.Message.CreateReactionAsync(DiscordEmoji.FromGuildEmote(client, 1023358256351019008)); // down_penty
+        });
+
     }
     
     /// <summary>
@@ -42,7 +62,7 @@ public static class EventHandlers
         {
             var words = (string[])GetWordsInString(e.Message.Content);
             if (words.Length > 5 && !CheckMessage(words))
-                await e.Message.RespondAsync("None of these words is in the bible. Good! >:3");
+                await e.Message.RespondAsync("none of these words is in the bible. good! >:3");
         }
     }
     
@@ -57,7 +77,7 @@ public static class EventHandlers
             e.Message.ReferencedMessage != null &&
             e.Message.ReferencedMessage.Author.Id == client.CurrentApplication.Id) // reply to bot
         {
-            await e.Message.RespondAsync("Sowwyy, i can't read :<");
+            await e.Message.RespondAsync("sowwyy, i can't read :<");
         }
     }
     
@@ -76,7 +96,7 @@ public static class EventHandlers
             {
                 if (user.Id != client.CurrentApplication.Id) continue;
                 
-                await e.Message.RespondAsync("Ow, you are talking about me? :3");
+                await e.Message.RespondAsync("ow, you are talking about me? :3");
                 return;
             }
         }
@@ -89,19 +109,26 @@ public static class EventHandlers
     /// <param name="e">The reaction event.</param>
     public static async Task ReactionAdded(DiscordClient client, MessageReactionAddEventArgs e)
     {
-        if (!e.Emoji.Name.Contains("penta")) return;
-
-        e.Channel.TriggerTypingAsync();
-        var message = await e.Channel.GetMessageAsync(e.Message.Id);
-        if (message.Author.Id == client.CurrentApplication.Id) // reacted to the bot
+        Task.Run(async () =>
         {
-            await new DiscordMessageBuilder()
-                .WithContent($"<@{e.User.Id}> Heyy cutie~! ;3")
-                .SendAsync(e.Channel);
-            return;
-        }
+            if (!e.Emoji.Name.Contains("pent") || // penta emoji
+                e.Emoji.Id is 1023358256351019008 or 1023358264617992212) // but not the vote emojis
+            {
+                return;
+            }
 
-        if (!CheckMessage(message))
-            await message.RespondAsync("None of these words is in the bible. Good! >:3");
+            e.Channel.TriggerTypingAsync();
+            var message = await e.Channel.GetMessageAsync(e.Message.Id);
+            if (message.Author.Id == client.CurrentApplication.Id) // reacted to the bot
+            {
+                await new DiscordMessageBuilder()
+                    .WithContent($"<@{e.User.Id}> heyy cutie~! ;3")
+                    .SendAsync(e.Channel);
+                return;
+            }
+
+            if (!CheckMessage(message))
+                await message.RespondAsync("none of these words is in the bible. good! >:3");
+        });
     }
 }

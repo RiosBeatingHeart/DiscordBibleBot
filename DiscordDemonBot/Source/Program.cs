@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Configuration;
-using System.IO;
-using DiscordBibleBot.Source.Commands;
+using DiscordDemonBot.Source.Commands;
 using DSharpPlus;
 using OpenAI_API;
 
-namespace DiscordBibleBot.Source;
+namespace DiscordDemonBot.Source;
 internal static class Program
 {
     private static void Main(string[] args)
@@ -38,7 +37,7 @@ internal static class Program
         bibleBot.DiscordClient.MessageReactionAdded += EventHandlers.ReactionAdded;
 
         // register commands
-        bibleBot.SlashCommands.RegisterCommands<SlashCommands>(959603483072405574);
+        bibleBot.SlashCommands.RegisterCommands<SlashCommands>();
 
         bibleBot.Run();
     }

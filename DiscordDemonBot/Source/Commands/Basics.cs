@@ -6,7 +6,7 @@
 // using DSharpPlus.Entities;
 // using OpenAI_API;
 //
-// namespace DiscordBibleBot.Source.Commands;
+// namespace DiscordDemonBot.Source.Commands;
 //
 // [Description("Prayers to the almighty God!")]
 // public class Commands : BaseCommandModule

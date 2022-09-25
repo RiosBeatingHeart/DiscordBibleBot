@@ -1,7 +1,7 @@
 using System.IO;
 using DSharpPlus.Entities;
 
-namespace DiscordBibleBot.Source.Roles;
+namespace DiscordDemonBot.Source.Roles;
 
 public struct Role
 {

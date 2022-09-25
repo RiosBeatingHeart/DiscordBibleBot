@@ -14,4 +14,4 @@ RUN dotnet publish -c Release -o /app -r linux-arm64 --self-contained true --no-
 FROM mcr.microsoft.com/dotnet/runtime:6.0-jammy-arm64v8
 WORKDIR /app
 COPY --from=build /app .
-ENTRYPOINT ["./DiscordBibleBot"]
+ENTRYPOINT ["./DiscordDemonBot"]

@@ -7,7 +7,7 @@ using DSharpPlus;
 using OpenAI_API;
 using DSharpPlus.SlashCommands;
 
-namespace DiscordBibleBot.Source;
+namespace DiscordDemonBot.Source;
 
 /// <summary>
 /// Singleton class that wraps bot related data.

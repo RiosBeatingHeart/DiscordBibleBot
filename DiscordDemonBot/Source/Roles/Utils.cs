@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DSharpPlus.Entities;
 
-namespace DiscordBibleBot.Source.Roles;
+namespace DiscordDemonBot.Source.Roles;
 
 public static class Utils
 {
@@ -13,7 +13,7 @@ public static class Utils
         // gets the roles the guild is missing
         var guildRoles = GetDiscordRoles(guild.Roles);
         
-        Role[] missing = DiscordBibleBot.Source.Roles.MyRoles.Enumerable
+        Role[] missing = MyRoles.Enumerable
             .Where(role => !guildRoles.ContainsKey(role))
             .ToArray();
         
@@ -59,7 +59,7 @@ public static class Utils
 
         foreach (var guildRole in roles)
         {
-            if (!DiscordBibleBot.Source.Roles.MyRoles.TryGetRole(guildRole.Name, out var myRole)) continue;
+            if (!MyRoles.TryGetRole(guildRole.Name, out var myRole)) continue;
             ret[(Role) myRole!] = guildRole;
         }
         
