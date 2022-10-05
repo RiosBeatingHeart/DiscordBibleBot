@@ -27,7 +27,7 @@ It uses the "Catholic Public Domain Bible" hosted on <a href="https://openbible.
 
 # Installation
 
-To invite God into your heart and add the Bible Bot to a discord server, just click this <a href="https://discord.com/api/oauth2/authorize?client_id=959594363820847144&permissions=52288&redirect_uri=https%3A%2F%2Fdiscordapp.com%2Foauth2%2Fauthorize%3F%26client_id%3D959594363820847144%26scope%3Dbot&scope=bot">LINK</a>.
+To invite God into your heart and add the Bible Bot to a discord server, just click this <a href="https://discord.com/api/oauth2/authorize?client_id=959594363820847144&permissions=1240642088000&scope=bot">LINK</a>.
 Once the Bible Bot has joined your server, you can add it to channels by typing the following prayer <code>🙏join</code>.
 
 # Reactions
