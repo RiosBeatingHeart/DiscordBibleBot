@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
+using DSharpPlus;
 using DSharpPlus.Entities;
+using Microsoft.VisualBasic;
 
 namespace DiscordDemonBot.Source;
 public static class Utils
@@ -71,4 +75,43 @@ public static class Utils
     /// <returns>true: if any are in the bible, else false</returns>
     public static bool CheckMessage(params string[] words) 
         => Bot.Instance.BibleWords.Overlaps(words);
+    
+    /// <summary>
+    /// Tries pinging an IP to check if the program is connected to the internet.
+    /// </summary>
+    /// <param name="hostIp">IP/URL of the server to ping. default: discord</param>
+    /// <returns>true. if online. else false</returns>
+    public static bool IsOnline(string  hostIp = "discord.com")
+    {
+        Ping myPing = new Ping();
+        byte[] buffer = new byte[32];
+        int timeout = 1000;
+        PingOptions pingOptions = new PingOptions();
+        PingReply reply = myPing.Send(hostIp, timeout, buffer, pingOptions);
+        return reply.Status == IPStatus.Success;
+    }
+
+    public static string GenerateKeySmash(int length, bool lettersOnly=false)
+    {
+        if (length <= 0) throw new ArithmeticException("Length has to be bigger than 0!");
+        
+        List<char> ret = new List<char>(length);
+        char[] rand = Array.Empty<char>();
+        int randPos = length;
+        while (ret.Count < length)
+        {
+            if (randPos >= length)
+            {
+                rand = Convert.ToBase64String(RandomNumberGenerator.GetBytes(length)).ToCharArray();
+                randPos = 0;
+            }
+            
+            if (!lettersOnly || char.IsLetter(rand[randPos]))
+                ret.Add(rand[randPos]);
+            randPos++;
+        }
+
+        return new string(ret.ToArray()).ToLower();
+    }
 }
+

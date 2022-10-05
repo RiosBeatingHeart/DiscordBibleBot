@@ -20,7 +20,7 @@ public static class EventHandlers
     /// <param name="e">The message event.</param>
     public static async Task MessageAddedVotableContent(DiscordClient client, MessageCreateEventArgs e)
     {
-        Task.Run(async () =>
+        await Task.Run(async () =>
         {
             string[] textContent = new[]
             {
@@ -109,7 +109,7 @@ public static class EventHandlers
     /// <param name="e">The reaction event.</param>
     public static async Task ReactionAdded(DiscordClient client, MessageReactionAddEventArgs e)
     {
-        Task.Run(async () =>
+        await Task.Run(async () =>
         {
             if (!e.Emoji.Name.Contains("pent") || // penta emoji
                 e.Emoji.Id is 1023358256351019008 or 1023358264617992212) // but not the vote emojis
@@ -121,8 +121,9 @@ public static class EventHandlers
             var message = await e.Channel.GetMessageAsync(e.Message.Id);
             if (message.Author.Id == client.CurrentApplication.Id) // reacted to the bot
             {
+                
                 await new DiscordMessageBuilder()
-                    .WithContent($"<@{e.User.Id}> heyy cutie~! ;3")
+                    .WithContent($"{Formatter.Mention(e.User, true)} heyy cutie~! ;3")
                     .SendAsync(e.Channel);
                 return;
             }

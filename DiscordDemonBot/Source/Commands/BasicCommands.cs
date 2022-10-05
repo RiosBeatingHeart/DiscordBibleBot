@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Security;
@@ -13,12 +14,14 @@ using DiscordDemonBot.Source.Roles;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
+using OpenAI_API;
 using static DiscordDemonBot.Source.Roles.Utils;
+
 #pragma warning disable CS4014
 
 namespace DiscordDemonBot.Source.Commands;
 
-public class SlashCommands : ApplicationCommandModule
+public class BasicCommands : ApplicationCommandModule
 {
     [SlashCommand("summon", "Summon a demon!")]
     public async Task SummonCommand(InteractionContext ctx)
@@ -50,6 +53,12 @@ public class SlashCommands : ApplicationCommandModule
             await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("oh c'mon, don't sacrifice me! >:("));
             return;
         }
+
+        if (sacrificedMember.IsBot)
+        {
+            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"{Formatter.Mention(sacrificedUser, true)} is a mere machine, satan has no use for it ;3"));
+            return;
+        }
         
         // sacrificed someone else
         if (ctx.Member != sacrificedMember)
@@ -69,7 +78,7 @@ public class SlashCommands : ApplicationCommandModule
                 sacrificedMember.GrantRoleAsync(guildRoles[MyRoles.Sacrificed], $"Was sacrificed by {ctx.Member.DisplayName}!"));
             
             await ctx.EditResponseAsync(new DiscordWebhookBuilder()
-                .WithContent($"woaah, you sacrificed <@{sacrificedMember.Id}>! satan is going to like this!"));
+                .WithContent($"woaah, you sacrificed <@{sacrificedMember.Id}>! satan is going to like this~! :3"));
             return;
         }
         
@@ -129,63 +138,4 @@ public class SlashCommands : ApplicationCommandModule
                          "..\n" +
                          "*murders you*"));
     }
-
-    public class BooruTagAutocompleteProvider : IAutocompleteProvider
-    {
-        public async Task<IEnumerable<DiscordAutoCompleteChoice>> Provider(AutocompleteContext ctx)
-        {
-            return new DiscordAutoCompleteChoice[]
-            {
-                new DiscordAutoCompleteChoice((string) ctx.OptionValue, ctx.OptionValue),
-            };
-        }
-    }
-
-    [SlashCommand("porn", "adsjgrnsdag")]
-    public async Task PornCommand(
-        InteractionContext ctx,
-        [Option("tags", "e621 tags! separate by ','")] string tags)
-    {
-        if (!ctx.Channel.IsNSFW)
-        {
-            await ctx.CreateResponseAsync("oh, you know i can't send porn in here! ;3");
-            return;
-        }
-        
-        // need to do this or the event gets wasted
-        await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
-        
-        // split tags up
-        string[] queryTags = tags.Split(',', StringSplitOptions.TrimEntries);
-
-        await Console.Out.WriteLineAsync($"Try sending porn with tags <{string.Join(", ", queryTags)}> to channel <{ctx.Channel.Name}> for user <{ctx.Member.DisplayName}>.");
-        var booru = new BooruSharp.Booru.E621();
-        try
-        {
-            var result = await booru.GetRandomPostAsync(queryTags);
-            await ctx.EditResponseAsync(new DiscordWebhookBuilder()
-                .AddEmbed(new DiscordEmbedBuilder
-                {
-                    Title = "e621",
-                    Url = result.FileUrl.AbsoluteUri,
-                    Description = $"tags: {string.Join(", ", queryTags)}",
-                    ImageUrl = result.FileUrl.AbsoluteUri,
-                }.Build()));
-            return;
-        }
-        catch (InvalidTags e)
-        {
-            Console.Out.WriteLineAsync($"Couldn't get porn for tags <{string.Join(", ", queryTags)}>.");
-        }
-
-        await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("sowwyy, i couldn't find what you are looking for.. :<"));
-    }
-    
-    [SlashCommand("count", "Count my bad words!")]
-    public async Task CountCommand(
-        InteractionContext ctx)
-    {
-        await ctx.CreateResponseAsync("nothing here yet. you are cute to~! :3");
-    }
-    
 }
