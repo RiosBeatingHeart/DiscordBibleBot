@@ -105,8 +105,7 @@ public class Bot
             var line = reader.ReadLine();
             while (line != null)
             {
-                var start = line.IndexOf("    ", StringComparison.Ordinal) +
-                            1; // get rid of the line number and book name
+                var start = line.IndexOf("    ", StringComparison.Ordinal) + 1; // get rid of the line number and book name
                 if (start > 0)
                     line = line.Substring(start);
 

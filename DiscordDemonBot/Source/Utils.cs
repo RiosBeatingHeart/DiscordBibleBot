@@ -11,37 +11,25 @@ using Microsoft.VisualBasic;
 namespace DiscordDemonBot.Source;
 public static class Utils
 {
+    
     /// <summary>
-    /// Splits a text string into its words.
-    /// </summary>
-    /// <param name="str">The string that should be split.</param>
-    /// <param name="preCleaned">Whether the string has already been cleaned.</param>
-    /// <returns>The words.</returns>
-    public static IEnumerable<string> GetWordsInString(string str, bool preCleaned = false)
-    {
-        str = preCleaned ? str : CleanString(str);
-        return str.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-    }
-        
-    /// <summary>
-    /// Replaces all chars except letters with spaces and merges adjacent spaces into one.
+    /// Separates words in a string by whitespaces and optionally removes special characters from those words.
     /// </summary>
     /// <param name="str">The string to clean.</param>
+    /// <param name="removeSpecialChars">Whether special chars (all non letter chars) should get removed.</param>
     /// <returns>A cleaned string.</returns>
-    public static string CleanString(string str)
+    public static string[] GetWordsInString(string str, bool removeSpecialChars = true)
     {
-        List<char> cleaned = new List<char>
-        {
-            Capacity = str.Length
-        };
-        foreach (char c in str.ToLower().ToCharArray())
-        {
-            if (char.IsLetter(c))
-                cleaned.Add(c);
-            else if (cleaned.Count == 0 || cleaned.Last() != ' ')
-                cleaned.Add(' ');
-        }
-        return new string(cleaned.ToArray());
+        
+        string? workStr = str.Select(c => char.IsWhiteSpace(c) ? ' ' : c).ToString();
+        if (workStr is null) return Array.Empty<string>();
+        
+        string[] words = str.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        if (removeSpecialChars) // remove special chars from all words
+            words = words.Select(word => word.Where(char.IsLetter).ToString()).ToArray()!;
+
+        return words;
     }
     
     /// <summary>

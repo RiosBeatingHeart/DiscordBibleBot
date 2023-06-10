@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Threading;
 using DiscordDemonBot.Source.Commands;
 using DSharpPlus;
+using Microsoft.Extensions.Logging;
 using OpenAI_API;
 using static DiscordDemonBot.Source.Utils;
 
@@ -34,17 +35,18 @@ internal static class Program
                 {
                     Token = oauth2Token,
                     TokenType = TokenType.Bot,
-                    Intents = DiscordIntents.AllUnprivileged
-                })
-                .SetOpenAiApi(new OpenAIAPI(new APIAuthentication(openAiKey), Engine.Davinci));
-            // .SetDatabase(new SqLiteDatabase().SetPath(Path.Join(Definitions.ResourceDir, databasePath)))
+                    Intents = DiscordIntents.AllUnprivileged,
+                    MinimumLogLevel = LogLevel.Information,
+                });
+            // .SetOpenAiApi(new OpenAIAPI(new APIAuthentication(openAiKey), Engine.Davinci));
+            // .SetDatabase(new SqLiteDatabase().SetPath(Path.Join(Definitions.ResourceDir, databasePath)));
 
             if (ConfigurationManager.AppSettings["MinWordLimit"] != null)
                 bibleBot.SetMinLetterLimit(int.Parse(ConfigurationManager.AppSettings["MinLetterLimit"]!));
 
             // register event handlers
             bibleBot.DiscordClient.MessageCreated += EventHandlers.MessageAddedReplyBot;
-            bibleBot.DiscordClient.MessageCreated += EventHandlers.MessageAddedCheckable;
+            bibleBot.DiscordClient.MessageCreated += EventHandlers.MessageAddedCheckable; // got annoying
             bibleBot.DiscordClient.MessageCreated += EventHandlers.MessageAddedVotableContent;
             bibleBot.DiscordClient.MessageCreated += EventHandlers.MessageAddedMentionBot;
             bibleBot.DiscordClient.MessageReactionAdded += EventHandlers.ReactionAdded;

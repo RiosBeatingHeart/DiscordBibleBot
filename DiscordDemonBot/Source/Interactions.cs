@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using DiscordDemonBot.Source.Roles;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using static DiscordDemonBot.Source.Utils;
+using static DiscordDemonBot.Source.Roles.Utils;
 
 #pragma warning disable CS4014 // call async without await
 
@@ -43,10 +45,21 @@ public static class EventHandlers
                 }
             }
             if (!hasContent) return;
+
+            ulong upEmoji = 1023358264617992212;
+            ulong downEmoji = 1023358256351019008;
+
+            switch (e.Guild.Id)
+            {
+                case 953438883859796008: // saturn mc discord server
+                    upEmoji = 1028823890815893614;
+                    downEmoji = 1028823892216774686;
+                    break;
+            }
             
             await Console.Out.WriteLineAsync("Adding vote emojis to message!");
-            await e.Message.CreateReactionAsync(DiscordEmoji.FromGuildEmote(client, 1023358264617992212)); // up_penty
-            await e.Message.CreateReactionAsync(DiscordEmoji.FromGuildEmote(client, 1023358256351019008)); // down_penty
+            await e.Message.CreateReactionAsync(DiscordEmoji.FromGuildEmote(client, upEmoji)); // up_penty
+            await e.Message.CreateReactionAsync(DiscordEmoji.FromGuildEmote(client, downEmoji)); // down_penty
         });
 
     }
@@ -58,9 +71,15 @@ public static class EventHandlers
     /// <param name="e">The message event.</param>
     public static async Task MessageAddedCheckable(DiscordClient client, MessageCreateEventArgs e)
     {
-        if (e.Author.Id != client.CurrentApplication.Id) // don't reply to yourself
+        var member = await e.Guild.GetMemberAsync(e.Author.Id);
+        var memberRoles = GetDiscordRoles(member.Roles);
+        
+        if (e.Author.Id != client.CurrentApplication.Id && ( // don't reply to yourself
+                memberRoles.ContainsKey(MyRoles.Cultist) || 
+                memberRoles.ContainsKey(MyRoles.Demon))) // only reply to cultists
         {
-            var words = (string[])GetWordsInString(e.Message.Content);
+            string[] words = GetWordsInString(e.Message.Content);
+            Console.Out.WriteAsync($"words: {string.Join(',', words)}");
             if (words.Length > 5 && !CheckMessage(words))
                 await e.Message.RespondAsync("none of these words is in the bible. good! >:3");
         }

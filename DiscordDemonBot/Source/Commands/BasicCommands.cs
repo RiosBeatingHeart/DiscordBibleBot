@@ -8,8 +8,6 @@ using System.Net.Security;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using BooruSharp.Search;
-using BooruSharp.Search.Wiki;
 using DiscordDemonBot.Source.Roles;
 using DSharpPlus;
 using DSharpPlus.Entities;

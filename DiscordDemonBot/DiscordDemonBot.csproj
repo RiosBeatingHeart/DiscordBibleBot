@@ -2,9 +2,9 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
-        <LangVersion>default</LangVersion>
+        <LangVersion>preview</LangVersion>
         <PackageId>DiscordDemonBot</PackageId>
     </PropertyGroup>
 
@@ -16,14 +16,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="BooruSharp" Version="3.5.4" />
-        <PackageReference Include="DSharpPlus" Version="4.3.0-nightly-01173" />
-        <PackageReference Include="DSharpPlus.CommandsNext" Version="4.3.0-nightly-01173" />
-        <PackageReference Include="DSharpPlus.Interactivity" Version="4.3.0-nightly-01173" />
-        <PackageReference Include="DSharpPlus.SlashCommands" Version="4.3.0-nightly-01173" />
-        <PackageReference Include="OpenAI" Version="1.2.0" />
-        <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0-rc.1.22426.10" />
-        <PackageReference Include="System.Data.SQLite" Version="1.0.116" />
+        <PackageReference Include="DSharpPlus" Version="5.0.0" />
+        <PackageReference Include="DSharpPlus.CommandsNext" Version="5.0.0" />
+        <PackageReference Include="DSharpPlus.Interactivity" Version="5.0.0" />
+        <PackageReference Include="DSharpPlus.SlashCommands" Version="5.0.0" />
+        <PackageReference Include="OpenAI" Version="1.7.2" />
+        <PackageReference Include="R34Sharp" Version="1.3.1" />
+        <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.0-preview.4.23259.5" />
+        <PackageReference Include="System.Data.SQLite" Version="1.0.117" />
         <PackageReference Include="System.Linq.Async" Version="6.0.1" />
         
     </ItemGroup>

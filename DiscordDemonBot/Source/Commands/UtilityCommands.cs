@@ -1,7 +1,4 @@
-using System;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
-using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 using static DiscordDemonBot.Source.Utils;
@@ -17,10 +14,15 @@ public class UtilityCommands: ApplicationCommandModule
         [Minimum(1)]
         [Option("length", "How long the keysmash should be!")] long length = 20)
     {
+        string keySmash = GenerateKeySmash((int) length, lettersOnly);
+        
         await ctx.CreateResponseAsync(new DiscordInteractionResponseBuilder
-        {
-            Content = Formatter.InlineCode(GenerateKeySmash((int)length, lettersOnly)),
-            IsEphemeral = true, // client side reply
-        });
+            {
+                IsEphemeral = true, // client side reply
+            }
+            .AddEmbed(new DiscordEmbedBuilder
+            {
+                Description = keySmash,
+            }.Build()));
     }
 }
